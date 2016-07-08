@@ -1,6 +1,6 @@
 {
   "name": "fridge",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "go away",
   "main": "index.js",
   "scripts": {
