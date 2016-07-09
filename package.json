@@ -2,10 +2,11 @@
   "name": "fridge",
   "version": "0.0.2",
   "description": "go away",
-  "main": "index.js",
+  "main": "fridge.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard && tap test/*.js"
   },
+  "precommit": "test",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mcollina/fridge.git"
@@ -15,5 +16,22 @@
   "bugs": {
     "url": "https://github.com/mcollina/fridge/issues"
   },
-  "homepage": "https://github.com/mcollina/fridge#readme"
+  "homepage": "https://github.com/mcollina/fridge#readme",
+  "dependencies": {
+    "color-prefix-stream": "^1.0.0",
+    "commist": "^1.0.0",
+    "dockerode": "^2.2.10",
+    "dockerode-build": "^1.1.5",
+    "help-me": "^0.2.0",
+    "minimist": "^1.2.0",
+    "pump": "^1.0.1",
+    "through2": "^2.0.1",
+    "yamljs": "^0.2.8",
+    "steed": "^1.0.0"
+  },
+  "devDependencies": {
+    "pre-commit": "^1.1.3",
+    "standard": "^7.1.2",
+    "tap": "^6.1.1"
+  }
 }
