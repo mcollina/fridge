@@ -4,6 +4,7 @@ const t = require('tap')
 const fridge = require('..')
 const split = require('split2')
 const path = require('path')
+const chalk = require('chalk')
 
 t.plan(6)
 
@@ -18,13 +19,14 @@ fridge.run(path.join(__dirname, 'start', 'fridge.yml'), (err, instance) => {
   t.ok(instance.services.a, 'service a exists')
   t.ok(instance.services.b, 'service b exists')
 
-  waitForLine(instance.services.a, 'hello from a')
-  waitForLine(instance.services.b, 'hello from b')
+  waitForLine(instance.services.a, `a (${instance.services.a.id}): hello from a`)
+  waitForLine(instance.services.b, `b (${instance.services.b.id}): hello from b`)
 
   function waitForLine (s, expected) {
     s.output
       .pipe(split())
-      .on('data', (line) => {
+      .once('data', (line) => {
+        line = chalk.stripColor(line)
         t.equal(line, expected, 'line matches')
       })
   }

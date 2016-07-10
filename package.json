@@ -3,6 +3,9 @@
   "version": "0.0.2",
   "description": "go away",
   "main": "fridge.js",
+  "bin": {
+    "fridge": "./fridge.js"
+  },
   "scripts": {
     "test": "standard && tap test/*.js"
   },

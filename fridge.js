@@ -1,12 +1,15 @@
+#! /usr/bin/env node
+
 'use strict'
 
 const fs = require('fs')
 const YAML = require('yamljs')
 const path = require('path')
-const types = require('./lib/types')
 const pump = require('pump')
-const prefixer = require('color-prefix-stream')
 const steed = require('steed')
+const minimist = require('minimist')
+const types = require('./lib/types')
+const launch = require('./lib/launch')
 
 function run (yml, cb) {
   fs.readFile(yml, 'utf8', (err, data) => {
@@ -28,13 +31,16 @@ function run (yml, cb) {
     for (var i = 0; i < names.length; i++) {
       const service = services[names[i]]
       service.name = names[i]
+
       if (!service.path) {
-        service.path = path.join(path.dirname(yml), service.name)
+        service.path = path.resolve(path.join(path.dirname(yml), service.name))
       }
 
       if (!types[service.type]) {
         cb(new Error('unknown type ' + service.type))
         return
+      } else {
+        service.type = types[service.type]
       }
 
       servicesArray[i] = service
@@ -49,29 +55,49 @@ function run (yml, cb) {
 
     function close (cb) {
       steed.each(servicesArray, (service, cb) => {
-        service.output.destroy()
+        service.destroy(cb)
       }, cb || noop)
     }
-  })
-}
-
-function launch (service, done) {
-  types[service.type].run(service, (err, stream) => {
-    if (err) {
-      return done(err)
-    }
-
-    service.output = stream
-
-    pump(service.output, prefixer({
-      prefix: `${service.name} (${service.pid})`,
-      rotate: true
-    }))
-
-    done(null, service)
   })
 }
 
 function noop () {}
 
 module.exports.run = run
+
+function start () {
+  const args = minimist(process.argv.slice(2))
+  var yml = args._[0]
+
+  if (!yml) {
+    yml = path.join(process.cwd(), 'fridge.yml')
+  }
+
+  try {
+    fs.accessSync(yml)
+  } catch (err) {
+    console.log(err.message)
+    console.log('Usage: fridge [YML]')
+    process.exit(1)
+  }
+
+  run(yml, (err, instance) => {
+    if (err) {
+      throw err
+    }
+    const services = instance.services
+    Object.keys(services).forEach((name) => {
+      pump(services[name].output, process.stdout, (err) => {
+        if (err) {
+          throw err
+        }
+
+        process.exit(0)
+      })
+    })
+  })
+}
+
+if (require.main === module) {
+  start()
+}
