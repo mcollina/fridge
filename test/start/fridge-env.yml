@@ -1,0 +1,6 @@
+a:
+  type: node
+b:
+  type: node
+  env:
+    WHO: matteo

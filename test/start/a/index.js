@@ -1,5 +1,7 @@
 'use strict'
 
-console.log('hello from a')
+const who = process.argv[2] || 'a'
+
+console.log('hello from', who)
 
 setInterval(() => {}, 1000)

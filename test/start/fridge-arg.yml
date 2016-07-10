@@ -1,0 +1,6 @@
+a:
+  type: node
+  args:
+    - matteo
+b:
+  type: node
