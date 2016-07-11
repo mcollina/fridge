@@ -1,0 +1,6 @@
+Fridge is a microservice development tool, to help you develop
+a system based on microservices on your laptop.
+
+Start by looking at help of the following commands:
+
+  fridge help run

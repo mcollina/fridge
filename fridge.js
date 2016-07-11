@@ -3,70 +3,17 @@
 'use strict'
 
 const fs = require('fs')
-const YAML = require('yamljs')
 const path = require('path')
 const pump = require('pump')
-const steed = require('steed')
 const minimist = require('minimist')
-const types = require('./lib/types')
-const launch = require('./lib/launch')
-
-function run (yml, cb) {
-  fs.readFile(yml, 'utf8', (err, data) => {
-    if (err) {
-      return cb(err)
-    }
-
-    var services
-
-    try {
-      services = YAML.parse(data)
-    } catch (err) {
-      return cb(err)
-    }
-
-    const names = Object.keys(services)
-    const servicesArray = new Array(services.length)
-
-    for (var i = 0; i < names.length; i++) {
-      const service = services[names[i]]
-      service.name = names[i]
-
-      if (!service.path) {
-        service.path = path.resolve(path.join(path.dirname(yml), service.name))
-      }
-
-      if (!types[service.type]) {
-        cb(new Error('unknown type ' + service.type))
-        return
-      } else {
-        service.type = types[service.type]
-      }
-
-      servicesArray[i] = service
-    }
-
-    steed.each(servicesArray, launch, (err) => {
-      cb(err, {
-        services,
-        close
-      })
-    })
-
-    function close (cb) {
-      steed.each(servicesArray, (service, cb) => {
-        service.destroy(cb)
-      }, cb || noop)
-    }
-  })
-}
-
-function noop () {}
+const commist = require('commist')
+const helpme = require('help-me')
+const run = require('./lib/run')
 
 module.exports.run = run
 
-function start () {
-  const args = minimist(process.argv.slice(2))
+function execRun (argv) {
+  const args = minimist(argv)
   var yml = args._[0]
 
   if (!yml) {
@@ -77,8 +24,9 @@ function start () {
     fs.accessSync(yml)
   } catch (err) {
     console.log(err.message)
-    console.log('Usage: fridge [YML]')
-    process.exit(1)
+    console.log()
+    help(['run'])
+    return
   }
 
   run(yml, (err, instance) => {
@@ -96,6 +44,31 @@ function start () {
       })
     })
   })
+
+  return true
+}
+
+function help (args) {
+  const instance = helpme({
+    dir: path.join(__dirname, 'help'),
+    ext: '.txt'
+  })
+
+  instance.toStdout(args)
+
+  return true
+}
+
+function start () {
+  const program = commist()
+    .register('run', execRun)
+    .register('help', help)
+
+  const result = program.parse(process.argv.splice(2))
+
+  if (result) {
+    execRun(result)
+  }
 }
 
 if (require.main === module) {

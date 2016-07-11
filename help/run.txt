@@ -1,0 +1,6 @@
+Usage: fridge [run] [FILE]
+       fridge [run] [DIR]
+
+Runs the system defined in FILE, or look in the current directory
+for a fridge.yml file. If it is passed a DIR, it looks in that
+directory for a fridge.yml file.
