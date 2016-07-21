@@ -34,6 +34,7 @@ function execRun (argv) {
       throw err
     }
     const services = instance.services
+    process.stdout.setMaxListeners(0)
     Object.keys(services).forEach((name) => {
       pump(services[name].output, process.stdout, (err) => {
         if (err) {
