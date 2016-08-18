@@ -1,6 +1,6 @@
 {
   "name": "fridge",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "go away",
   "main": "fridge.js",
   "bin": {
